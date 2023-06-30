@@ -2,6 +2,8 @@ FROM ubuntu
 
 RUN apt-get update
 
+RUN apt-get install -y apt-utils
+
 RUN apt-get install -y \
 	curl \
 	git \
@@ -31,9 +33,11 @@ RUN tar -xzf terraform-docs.tar.gz && chmod +x terraform-docs && mv terraform-do
 
 RUN rm -rf /var/lib/apt/lists/*
 
-COPY bin/* /usr/local/bin/.
-RUN cd /usr/local/bin && tar -xvf pytree.tgz && rm pytree.tgz
-RUN chmod +x /usr/local/bin/tfcheck /usr/local/bin/tf-unused /usr/local/bin/pytree
+COPY bin/* /usr/local/bin/
+WORKDIR /usr/local/bin
+RUN wget "https://github.com/peanutsguy/coder-docker-az-tf-pwsh/raw/release/build/bin/pytree.tgz" -O pytree.tgz
+RUN tar -xvf pytree.tgz && rm pytree.tgz
+RUN chmod +x tfcheck tf-unused pytree
 
 ARG USER=coder
 RUN useradd --groups sudo --no-create-home --shell /bin/bash ${USER} \
